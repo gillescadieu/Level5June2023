@@ -38,3 +38,5 @@ starships = {'1701': 'Enterprise',
 for ship in starships:
     print("NCC-"+ship, "is the USS", starships[ship])
 
+print("Tony is a Star Trek fan")
+
