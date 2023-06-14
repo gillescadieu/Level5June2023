@@ -1,11 +1,27 @@
 ---
 all:
   vars:
-    ansible_connection: network_cli
+
+  # Use these variables for eAPI
+
+    ansible_connection: httpapi
     ansible_user: arista
+    ansible_password: arista3sho
     ansible_network_os: eos
     ansible_become: yes
     ansible_become_method: enable
+    ansible_httpapi_use_ssl: True
+    ansible_httpapi_validate_certs: False
+    ansible_httpapi_port: 443
+
+  # Use these variables for SSH
+
+    # ansible_connection: network_cli
+    # ansible_user: arista
+    # ansible_network_os: eos
+    # ansible_become: yes
+    # ansible_become_method: enable
+
   children:
     DC1:
       children:
