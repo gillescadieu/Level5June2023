@@ -1,0 +1,12 @@
+---
+- name: Upload configlets
+  hosts: cvp1
+  vars:
+    configlet_list:
+      tonyb_alias: "{{ lookup('file', '../configlets/tonyb_alias.txt') }}"
+      MLAG_Left: "{{ lookup('file', '../configlets/MLAG_Left.txt') }}"
+      MLAG_Right: "{{ lookup('file', '../configlets/MLAG_Right.txt') }}"
+  tasks:
+    - name: Upload configlets
+      arista.cvp.cv_configlet_v3:
+        configlets: "{{ configlet_list }}"

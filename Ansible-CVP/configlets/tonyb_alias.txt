@@ -1,0 +1,2 @@
+alias tonyb3 show ip interface brief
+alias tonyb4 show bgp evpn summary
