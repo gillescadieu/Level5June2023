@@ -1,0 +1,14 @@
+---
+- name: Create a LAG
+  hosts: Leafs_DC1
+  tasks:
+  - name: Create po2000 from e1/e2
+    arista.eos.eos_lag_interfaces:
+      config: 
+        - name: 2000
+          members:
+            - member: Ethernet1
+              mode: active
+            - member: Ethernet2
+              mode: active
+      state: merged

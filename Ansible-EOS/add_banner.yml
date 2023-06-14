@@ -1,0 +1,10 @@
+---
+- name: Add a banner to devices
+  hosts: all
+  tasks:
+    - name: configure the login banner
+      arista.eos.eos_banner:
+        banner: login
+        text: |
+          You've logged into an awesome system
+        state: present
