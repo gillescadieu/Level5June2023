@@ -3,7 +3,7 @@ import pyeapi
 
 
 vlans = [100,101,102,103,55,2100]
-switches = ['leaf1-DC1', 'leaf2-DC1', 'leaf3-DC1', 'leaf4-DC1', 'borderleaf1-DC1', 'borderleaf2-DC1']
+switches = ['leaf1-DC1', 'leaf2-DC1', 'leaf3-DC1', 'leaf4-DC1']
 
 for switch in switches: 
     connect = pyeapi.connect_to(switch)
