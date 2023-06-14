@@ -31,14 +31,13 @@ for switch in switches:
         if len(vlan_output['vlans'][vlan]['interfaces']) == 0:
             print("  VLAN", vlan, "is empty")
         if len(vlan_output['vlans'][vlan]['interfaces']) != 0:
-            print("  VLAN", vlan, "is not empty and containts:")
+            print("  VLAN", vlan, "is not empty and contains:")
         for interface in vlan_output['vlans'][vlan]['interfaces']:
-            print("     ", interface)
+            check_int_command = "show interfaces "+interface
+            int_output = connect.run_commands([check_int_command],)
+            int_status = int_output[0]['interfaces'][interface]['interfaceStatus']
+            if int_status == "connected":
+                print("        interface ", interface, "is connected")
+            if int_status != "connected":
+                print("        interface ", interface, "is not connected")
 
-
-    # "show vlan" # Get results in JSON, load the JSON into a dict
-
-#         if result == True:
-#             print("We added VLAN", vlan, "for switch", switch)
-#         if result == False:
-#             print("Something went wrong")
