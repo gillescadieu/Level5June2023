@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 
 import pyeapi
+import time
+import datetime
+
+presentDate = datetime.datetime.now()
+unixtime = datetime.datetime.timestamp(presentDate)
 
 # The aim is to free up subnets allocated to SVIs 10 and 20 on a hundred switches 
 # so if a switch has no VLAN 10 or 20 allocated to any "up interfaces" then we can consider the subnet unused if the "down interfaces" have been down for a certain amount of time (eg 90 days)
@@ -36,8 +41,13 @@ for switch in switches:
             check_int_command = "show interfaces "+interface
             int_output = connect.run_commands([check_int_command],)
             int_status = int_output[0]['interfaces'][interface]['interfaceStatus']
+            int_time = int_output[0]['interfaces'][interface]['lastStatusChangeTimestamp']
+            delta_time = unixtime - int_time
+            delta_time = int(delta_time)
             if int_status == "connected":
-                print("        interface ", interface, "is connected")
+                print("        interface ", interface, "is connected for ", delta_time, "seconds")
             if int_status != "connected":
-                print("        interface ", interface, "is not connected")
+                print("        interface ", interface, "is not connected for", delta_time, "seconds")
+           
+
 
