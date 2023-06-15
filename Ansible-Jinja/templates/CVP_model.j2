@@ -1,0 +1,7 @@
+{%raw%}path: "{{lookup('env','PWD')}}"{%endraw%}
+
+cvp_configlets_evpn:
+{% for switch in underlay['devices'] %}
+  {{ switch }}_EVPN: {%raw%}"{{lookup('file','{{path}}/configs/{%endraw%}{{ switch }}/{{ switch }}_EVPN.cfg')}}"
+  {{ switch }}_interface: {%raw%}"{{lookup('file','{{path}}/configs/{%endraw%}{{ switch }}/{{ switch }}_interface.cfg')}}"
+{% endfor %}

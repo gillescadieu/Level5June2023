@@ -1,0 +1,5 @@
+path: "{{lookup('env','PWD')}}" 
+
+cvp_configlets_evpn:
+  leaf1-DC1_EVPN: "{{lookup('file','{{path}}/configs/leaf1-DC1/leaf1-DC1_EVPN.cfg')}}"
+  leaf1-DC1_interface: "{{lookup('file','{{path}}/configs/leaf1-DC1/leaf1-DC1_interface.cfg')}}"
