@@ -1,0 +1,27 @@
+leaf2-DC1:
+  interfaces:
+    loopback0:
+      ipv4: 192.168.101.12
+      mask: 32
+    loopback1:
+      ipv4: 192.168.102.11
+      mask: 32
+    Ethernet3:
+      ipv4: 192.168.103.6
+      mask: 31
+    Ethernet4:
+      ipv4: 192.168.103.8
+      mask: 31
+    Ethernet5:
+      ipv4: 192.168.103.10
+      mask: 31
+  BGP:
+    ASN: 65101
+    spine_peers: [192.168.101.101, 192,168.101.102, 192.168.101.103]
+
+
+
+
+if "Ethernet" in interface_name:
+  print("  no switchport")
+  print("  mtu 9214")
