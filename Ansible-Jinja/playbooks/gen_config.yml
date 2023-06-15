@@ -1,0 +1,44 @@
+- name: Generate interface configs
+  hosts: DC1, DC2
+  tasks:
+    - name: Load data model as a Ansible dictionary
+      include_vars:
+        file: ../vars/EVPN_model.yml
+        name: underlay
+    - name: Generate config from Jinja template
+      template:
+        src: "{{ lookup('env','PWD') }}/templates/interfaces.j2"
+        dest: "{{ lookup('env','PWD') }}/configs/{{ inventory_hostname }}/{{ inventory_hostname }}_interface.cfg"
+        mode: '0644'
+        owner: coder
+        group: coder
+
+- name: Generate EVPN configs for spines
+  hosts: Spines_DC1, Spines_DC2
+  tasks:
+    - name: Load data model as a Ansible dictionary
+      include_vars:
+        file: ../vars/EVPN_model.yml
+        name: underlay
+    - name: Generate config from Jinja template
+      template:
+        src: "{{ lookup('env','PWD') }}/templates/EVPN_spines.j2"
+        dest: "{{ lookup('env','PWD') }}/configs/{{ inventory_hostname }}/{{ inventory_hostname }}_EVPN.cfg"
+        mode: '0644'
+        owner: coder
+        group: coder
+
+- name: Generate EVPN configs for leafs
+  hosts: Leafs_DC1, Leafs_DC2
+  tasks:
+    - name: Load data model as a Ansible dictionary
+      include_vars:
+        file: ../vars/EVPN_model.yml
+        name: underlay
+    - name: Generate config from Jinja template
+      template:
+        src: "{{ lookup('env','PWD') }}/templates/EVPN_leafs.j2"
+        dest: "{{ lookup('env','PWD') }}/configs/{{ inventory_hostname }}/{{ inventory_hostname }}_EVPN.cfg"
+        mode: '0644'
+        owner: coder
+        group: coder

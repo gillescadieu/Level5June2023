@@ -1,0 +1,11 @@
+---
+- name: Create directories
+  hosts: DC1, DC2, DCI
+  tasks:
+  - name: Create a unique directory per device
+    file:
+      path: "./configs/{{ inventory_hostname }}"
+      state: directory
+      mode: '0755'
+      owner: coder
+      group: coder

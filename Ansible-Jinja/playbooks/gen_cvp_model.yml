@@ -1,0 +1,14 @@
+- name: Generate CVP data model
+  hosts: cvp1
+  tasks:
+    - name: Load data model as a Ansible dictionary
+      include_vars:
+        file: ../vars/EVPN_model.yml
+        name: underlay
+    - name: Generate CVP data model from Jinja template
+      template:
+        src: "{{ lookup('env','PWD') }}/templates/CVP_model.j2"
+        dest: "{{ lookup('env','PWD') }}/vars/CVP_model.yml"
+        mode: '0644'
+        owner: coder
+        group: coder

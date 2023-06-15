@@ -1,0 +1,65 @@
+{% set seq = namespace(c = 10) %}
+ip prefix-list LOOPBACK
+{% for prefix in underlay['DC_global']['route_map'] %}
+   seq {{ seq.c }} permit {{ prefix }} eq 32 
+{% set seq.c = seq.c + 10 %}
+{% endfor %}
+
+route-map LOOPBACK permit 10
+   match ip address prefix-list LOOPBACK
+
+router bgp {{ underlay['devices'][inventory_hostname]['BGP']['ASN'] }}
+   router-id {{ underlay['devices'][inventory_hostname]['interfaces']['loopback0']['ipv4'] }}
+
+   no bgp default ipv4-unicast
+   maximum-paths 3
+   distance bgp 20 200 200
+
+
+   neighbor Underlay peer group  
+
+
+   
+
+   neighbor Underlay remote-as {{ underlay['devices'][inventory_hostname]['BGP']['spine_ASN'] }}
+   neighbor Underlay send-community 
+   neighbor Underlay maximum-routes 12000
+
+   neighbor LEAF_Peer peer group
+   neighbor LEAF_Peer remote-as {{ underlay['devices'][inventory_hostname]['BGP']['ASN'] }}
+   neighbor LEAF_Peer next-hop-self
+   neighbor LEAF_Peer maximum-routes 12000
+
+{% for peer in underlay['devices'][inventory_hostname]['BGP']['spine_peers'] %}
+   neighbor {{ peer }} peer group Underlay
+{% endfor %}
+
+{% if underlay['devices'][inventory_hostname]['MLAG'] == "Odd" %}
+   neighbor 192.168.255.2 peer group LEAF_Peer
+{% endif %}
+{% if underlay['devices'][inventory_hostname]['MLAG'] == "Even" %}
+   neighbor 192.168.255.1 peer group LEAF_Peer
+{% endif %}
+
+   neighbor EVPN peer group
+ 
+   neighbor EVPN remote-as {{ underlay['devices'][inventory_hostname]['BGP']['spine_ASN'] }}
+  
+    neighbor EVPN update-source Loopback0
+    neighbor EVPN ebgp-multihop 3
+    neighbor EVPN send-community 
+    neighbor EVPN maximum-routes 0
+
+{% set DC_list = inventory_hostname.split('-') %}
+{% set DC = DC_list[1] %}
+{% for peer in underlay['DC_global'][DC]['spine_peers']%}
+    neighbor {{ peer }} peer group EVPN
+{% endfor %}
+ 
+    address-family evpn
+      neighbor EVPN activate
+   
+    address-family ipv4
+      neighbor Underlay activate
+      neighbor LEAF_Peer activate
+      redistribute connected route-map LOOPBACK
