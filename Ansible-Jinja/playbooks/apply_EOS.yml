@@ -1,0 +1,8 @@
+---
+- name: Upload config to EOS directly
+  hosts: leaf1-DC1
+  tasks:
+  - name: render a config to EOS
+    arista.eos.eos_config:
+      src: ../configs/leaf1-DC1_complete.txt
+      replace: config

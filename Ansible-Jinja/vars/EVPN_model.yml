@@ -229,11 +229,10 @@ devices:
       DCI-peers:
         - 192.168.254.1
     MLAG: Odd
-
   borderleaf2-DC1:
     interfaces:
       loopback0: 
-        ipv4: 192.168.101.21
+        ipv4: 192.168.101.22
         mask: 32
       loopback1: 
         ipv4: 192.168.102.21

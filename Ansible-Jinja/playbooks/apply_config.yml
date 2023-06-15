@@ -1,0 +1,15 @@
+---
+- name: Apply configlets
+  hosts: cvp1
+  vars_files:
+    - ../vars/CVP_model.yml
+  tasks:
+    - name: Apply configlet to devices
+      arista.cvp.cv_device_v3:
+        devices: "{{ cvp_devices_evpn }}"
+        state: present
+        apply_mode: strict
+    #   register: apply
+    # - name: Run the change control
+    #   arista.cvp.cv_task_v3:
+    #     tasks: "{{ apply.taskIds }}"
