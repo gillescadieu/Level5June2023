@@ -1,0 +1,25 @@
+---
+- name: Apply configlets
+  hosts: cvp1
+  vars:
+    cvp_devices:
+      - fqdn: leaf3-DC1
+        parentContainerName: Leaf-DC1
+        configlets:
+          - 'ATD-INFRA'
+          - 'leaf3-DC1-BASE'
+      - fqdn: leaf4-DC1
+        parentContainerName: Leaf-DC1
+        configlets:
+          - 'ATD-INFRA'
+          - 'leaf4-DC1-BASE'
+  tasks:
+    - name: Apply configlet to devices
+      arista.cvp.cv_device_v3:
+        devices: "{{ cvp_devices }}"
+        state: present
+        apply_mode: strict
+      register: apply
+    - name: Run the change control
+      arista.cvp.cv_task_v3:
+        tasks: "{{ apply.taskIds }}"
