@@ -63,12 +63,18 @@ l3leaf:
           mgmt_ip: 192.168.0.24/24
           uplink_switch_interfaces: [Ethernet5, Ethernet5, Ethernet5]
     dc1_mlag3:
+      bgp_as: 65199
       nodes:
         borderleaf1-DC1:  
           id: 5
           mgmt_ip: 192.168.0.25/24
-          uplink_switch_interfaces: [Ethernet6, Ethernet6, Ethernet6]
+          uplink_switches: [spine1-DC1, spine2-DC1, spine3-DC1, DCI]
+          uplink_switch_interfaces: [Ethernet6, Ethernet6, Ethernet6, Ethernet1]
+          evpn_route_servers: [spine1-DC1, spine2-DC1, spine3-DC1, DCI]
+
         borderleaf2-DC1:  
           id: 6
           mgmt_ip: 192.168.0.26/24
-          uplink_switch_interfaces: [Ethernet7, Ethernet7, Ethernet7]
+          uplink_switches: [spine1-DC1, spine2-DC1, spine3-DC1, DCI]
+          uplink_switch_interfaces: [Ethernet7, Ethernet7, Ethernet7, Ethernet2]
+          evpn_route_servers: [spine1-DC1, spine2-DC1, spine3-DC1, DCI]

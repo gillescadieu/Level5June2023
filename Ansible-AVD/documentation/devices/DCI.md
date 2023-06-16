@@ -1,4 +1,4 @@
-# spine3-DC1
+# DCI
 # Table of Contents
 
 - [Management](#management)
@@ -108,58 +108,42 @@ vlan internal order ascending range 1006 1199
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet2 | P2P_LINK_TO_LEAF1-DC1_Ethernet5 | routed | - | 192.168.103.4/31 | default | 1550 | False | - | - |
-| Ethernet3 | P2P_LINK_TO_LEAF2-DC1_Ethernet5 | routed | - | 192.168.103.10/31 | default | 1550 | False | - | - |
-| Ethernet4 | P2P_LINK_TO_LEAF3-DC1_Ethernet5 | routed | - | 192.168.103.16/31 | default | 1550 | False | - | - |
-| Ethernet5 | P2P_LINK_TO_LEAF4-DC1_Ethernet5 | routed | - | 192.168.103.22/31 | default | 1550 | False | - | - |
-| Ethernet6 | P2P_LINK_TO_BORDERLEAF1-DC1_Ethernet5 | routed | - | 192.168.103.36/31 | default | 1550 | False | - | - |
-| Ethernet7 | P2P_LINK_TO_BORDERLEAF2-DC1_Ethernet5 | routed | - | 192.168.103.44/31 | default | 1550 | False | - | - |
+| Ethernet1 | P2P_LINK_TO_borderleaf1-DC1_Ethernet12 | routed | - | 172.31.252.1/31 | default | 1550 | False | - | - |
+| Ethernet2 | P2P_LINK_TO_borderleaf2-DC1_Ethernet12 | routed | - | 172.31.252.3/31 | default | 1550 | False | - | - |
+| Ethernet3 | P2P_LINK_TO_borderleaf1-DC2_Ethernet12 | routed | - | 172.31.252.5/31 | default | 1550 | False | - | - |
+| Ethernet4 | P2P_LINK_TO_borderleaf2-DC2_Ethernet12 | routed | - | 172.31.252.7/31 | default | 1550 | False | - | - |
 
 ### Ethernet Interfaces Device Configuration
 
 ```eos
 !
-interface Ethernet2
-   description P2P_LINK_TO_LEAF1-DC1_Ethernet5
+interface Ethernet1
+   description P2P_LINK_TO_borderleaf1-DC1_Ethernet12
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.4/31
+   ip address 172.31.252.1/31
+!
+interface Ethernet2
+   description P2P_LINK_TO_borderleaf2-DC1_Ethernet12
+   no shutdown
+   mtu 1550
+   no switchport
+   ip address 172.31.252.3/31
 !
 interface Ethernet3
-   description P2P_LINK_TO_LEAF2-DC1_Ethernet5
+   description P2P_LINK_TO_borderleaf1-DC2_Ethernet12
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.10/31
+   ip address 172.31.252.5/31
 !
 interface Ethernet4
-   description P2P_LINK_TO_LEAF3-DC1_Ethernet5
+   description P2P_LINK_TO_borderleaf2-DC2_Ethernet12
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.16/31
-!
-interface Ethernet5
-   description P2P_LINK_TO_LEAF4-DC1_Ethernet5
-   no shutdown
-   mtu 1550
-   no switchport
-   ip address 192.168.103.22/31
-!
-interface Ethernet6
-   description P2P_LINK_TO_BORDERLEAF1-DC1_Ethernet5
-   no shutdown
-   mtu 1550
-   no switchport
-   ip address 192.168.103.36/31
-!
-interface Ethernet7
-   description P2P_LINK_TO_BORDERLEAF2-DC1_Ethernet5
-   no shutdown
-   mtu 1550
-   no switchport
-   ip address 192.168.103.44/31
+   ip address 172.31.252.7/31
 ```
 
 ## Loopback Interfaces
@@ -170,7 +154,7 @@ interface Ethernet7
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.101.13/32 |
+| Loopback0 | EVPN_Overlay_Peering | default | 192.168.93.1/32 |
 
 #### IPv6
 
@@ -186,7 +170,7 @@ interface Ethernet7
 interface Loopback0
    description EVPN_Overlay_Peering
    no shutdown
-   ip address 192.168.101.13/32
+   ip address 192.168.93.1/32
 ```
 
 # Routing
@@ -230,12 +214,10 @@ no ip routing vrf MGMT
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65100|  192.168.101.13 |
+| 65001|  192.168.93.1 |
 
 | BGP Tuning |
 | ---------- |
-| no bgp default ipv4-unicast |
-| distance bgp 20 200 200 |
 | maximum-paths 4 ecmp 4 |
 
 ### Router BGP Peer Groups
@@ -264,18 +246,14 @@ no ip routing vrf MGMT
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- |
-| 192.168.101.1 | 65101 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
-| 192.168.101.2 | 65101 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
-| 192.168.101.3 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
-| 192.168.101.4 | 65103 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
+| 172.31.252.0 | 65199 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 172.31.252.2 | 65199 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 172.31.252.4 | 65299 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 172.31.252.6 | 65299 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
 | 192.168.101.5 | 65199 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
 | 192.168.101.6 | 65199 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
-| 192.168.103.5 | 65101 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
-| 192.168.103.11 | 65101 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
-| 192.168.103.17 | 65103 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
-| 192.168.103.23 | 65103 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
-| 192.168.103.37 | 65199 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
-| 192.168.103.45 | 65199 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 192.168.201.5 | 65299 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
+| 192.168.201.6 | 65299 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
 
 ### Router BGP EVPN Address Family
 
@@ -289,10 +267,8 @@ no ip routing vrf MGMT
 
 ```eos
 !
-router bgp 65100
-   router-id 192.168.101.13
-   no bgp default ipv4-unicast
-   distance bgp 20 200 200
+router bgp 65001
+   router-id 192.168.93.1
    maximum-paths 4 ecmp 4
    neighbor EVPN-OVERLAY-PEERS peer group
    neighbor EVPN-OVERLAY-PEERS next-hop-unchanged
@@ -304,42 +280,34 @@ router bgp 65100
    neighbor IPv4-UNDERLAY-PEERS peer group
    neighbor IPv4-UNDERLAY-PEERS send-community
    neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
-   neighbor 192.168.101.1 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.101.1 remote-as 65101
-   neighbor 192.168.101.1 description leaf1-DC1
-   neighbor 192.168.101.2 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.101.2 remote-as 65101
-   neighbor 192.168.101.2 description leaf2-DC1
-   neighbor 192.168.101.3 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.101.3 remote-as 65103
-   neighbor 192.168.101.3 description leaf3-DC1
-   neighbor 192.168.101.4 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.101.4 remote-as 65103
-   neighbor 192.168.101.4 description leaf4-DC1
+   neighbor 172.31.252.0 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.252.0 remote-as 65199
+   neighbor 172.31.252.0 local-as 65000 no-prepend replace-as
+   neighbor 172.31.252.0 description borderleaf1-DC1
+   neighbor 172.31.252.2 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.252.2 remote-as 65199
+   neighbor 172.31.252.2 local-as 65000 no-prepend replace-as
+   neighbor 172.31.252.2 description borderleaf2-DC1
+   neighbor 172.31.252.4 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.252.4 remote-as 65299
+   neighbor 172.31.252.4 local-as 65000 no-prepend replace-as
+   neighbor 172.31.252.4 description borderleaf1-DC2
+   neighbor 172.31.252.6 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.31.252.6 remote-as 65299
+   neighbor 172.31.252.6 local-as 65000 no-prepend replace-as
+   neighbor 172.31.252.6 description borderleaf2-DC2
    neighbor 192.168.101.5 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.101.5 remote-as 65199
    neighbor 192.168.101.5 description borderleaf1-DC1
    neighbor 192.168.101.6 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.101.6 remote-as 65199
    neighbor 192.168.101.6 description borderleaf2-DC1
-   neighbor 192.168.103.5 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.5 remote-as 65101
-   neighbor 192.168.103.5 description leaf1-DC1_Ethernet5
-   neighbor 192.168.103.11 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.11 remote-as 65101
-   neighbor 192.168.103.11 description leaf2-DC1_Ethernet5
-   neighbor 192.168.103.17 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.17 remote-as 65103
-   neighbor 192.168.103.17 description leaf3-DC1_Ethernet5
-   neighbor 192.168.103.23 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.23 remote-as 65103
-   neighbor 192.168.103.23 description leaf4-DC1_Ethernet5
-   neighbor 192.168.103.37 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.37 remote-as 65199
-   neighbor 192.168.103.37 description borderleaf1-DC1_Ethernet5
-   neighbor 192.168.103.45 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.45 remote-as 65199
-   neighbor 192.168.103.45 description borderleaf2-DC1_Ethernet5
+   neighbor 192.168.201.5 peer group EVPN-OVERLAY-PEERS
+   neighbor 192.168.201.5 remote-as 65299
+   neighbor 192.168.201.5 description borderleaf1-DC2
+   neighbor 192.168.201.6 peer group EVPN-OVERLAY-PEERS
+   neighbor 192.168.201.6 remote-as 65299
+   neighbor 192.168.201.6 description borderleaf2-DC2
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn
@@ -380,14 +348,14 @@ router bfd
 
 | Sequence | Action |
 | -------- | ------ |
-| 10 | permit 192.168.101.0/24 eq 32 |
+| 10 | permit 192.168.93.0/24 eq 32 |
 
 ### Prefix-lists Device Configuration
 
 ```eos
 !
 ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
-   seq 10 permit 192.168.101.0/24 eq 32
+   seq 10 permit 192.168.93.0/24 eq 32
 ```
 
 ## Route-maps

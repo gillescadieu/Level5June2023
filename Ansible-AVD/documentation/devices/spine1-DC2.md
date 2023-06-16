@@ -112,6 +112,7 @@ vlan internal order ascending range 1006 1199
 | Ethernet3 | P2P_LINK_TO_LEAF2-DC2_Ethernet3 | routed | - | 192.168.203.6/31 | default | 1550 | False | - | - |
 | Ethernet4 | P2P_LINK_TO_LEAF3-DC2_Ethernet3 | routed | - | 192.168.203.12/31 | default | 1550 | False | - | - |
 | Ethernet5 | P2P_LINK_TO_LEAF4-DC2_Ethernet3 | routed | - | 192.168.203.18/31 | default | 1550 | False | - | - |
+| Ethernet7 | P2P_LINK_TO_BORDERLEAF2-DC2_Ethernet3 | routed | - | 192.168.203.40/31 | default | 1550 | False | - | - |
 
 ### Ethernet Interfaces Device Configuration
 
@@ -144,6 +145,13 @@ interface Ethernet5
    mtu 1550
    no switchport
    ip address 192.168.203.18/31
+!
+interface Ethernet7
+   description P2P_LINK_TO_BORDERLEAF2-DC2_Ethernet3
+   no shutdown
+   mtu 1550
+   no switchport
+   ip address 192.168.203.40/31
 ```
 
 ## Loopback Interfaces
@@ -252,10 +260,14 @@ no ip routing vrf MGMT
 | 192.168.201.2 | 65201 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
 | 192.168.201.3 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
 | 192.168.201.4 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
+| 192.168.201.5 | 65299 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
+| 192.168.201.6 | 65299 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - |
 | 192.168.203.1 | 65201 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
 | 192.168.203.7 | 65201 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
 | 192.168.203.13 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
 | 192.168.203.19 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 192.168.203.33 | 65299 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
+| 192.168.203.41 | 65299 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - |
 
 ### Router BGP EVPN Address Family
 
@@ -296,6 +308,12 @@ router bgp 65200
    neighbor 192.168.201.4 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.201.4 remote-as 65203
    neighbor 192.168.201.4 description leaf4-DC2
+   neighbor 192.168.201.5 peer group EVPN-OVERLAY-PEERS
+   neighbor 192.168.201.5 remote-as 65299
+   neighbor 192.168.201.5 description borderleaf1-DC2
+   neighbor 192.168.201.6 peer group EVPN-OVERLAY-PEERS
+   neighbor 192.168.201.6 remote-as 65299
+   neighbor 192.168.201.6 description borderleaf2-DC2
    neighbor 192.168.203.1 peer group IPv4-UNDERLAY-PEERS
    neighbor 192.168.203.1 remote-as 65201
    neighbor 192.168.203.1 description leaf1-DC2_Ethernet3
@@ -308,6 +326,12 @@ router bgp 65200
    neighbor 192.168.203.19 peer group IPv4-UNDERLAY-PEERS
    neighbor 192.168.203.19 remote-as 65203
    neighbor 192.168.203.19 description leaf4-DC2_Ethernet3
+   neighbor 192.168.203.33 peer group IPv4-UNDERLAY-PEERS
+   neighbor 192.168.203.33 remote-as 65299
+   neighbor 192.168.203.33 description borderleaf1-DC2_Ethernet3
+   neighbor 192.168.203.41 peer group IPv4-UNDERLAY-PEERS
+   neighbor 192.168.203.41 remote-as 65299
+   neighbor 192.168.203.41 description borderleaf2-DC2_Ethernet3
    redistribute connected route-map RM-CONN-2-BGP
    !
    address-family evpn

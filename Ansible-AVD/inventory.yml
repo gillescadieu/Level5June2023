@@ -29,12 +29,12 @@ all:
         # ansible_become: yes
         # ansible_become_method: enable
       children:
-        # DCI:
-        #   vars:
-        #     type: super-spine
-        #   hosts:
-        #     DCI:
-        #       ansible_host: 192.168.0.75
+        DCI:
+          vars:
+            type: super-spine
+          hosts:
+            DCI:
+              ansible_host: 192.168.0.76
         DC1:
           children:
             DC1_SPINES:
