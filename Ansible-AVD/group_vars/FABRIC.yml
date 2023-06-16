@@ -1,0 +1,6 @@
+--- 
+
+fabric_name: FABRIC
+
+p2p_uplinks_mtu: 1550
+

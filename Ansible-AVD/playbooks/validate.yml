@@ -1,0 +1,7 @@
+---
+- name: Run fabric validation tests for post deployment checks
+  hosts: FABRIC
+  tasks:
+  - name: Run tests
+    import_role:
+      name: arista.avd.eos_validate_state

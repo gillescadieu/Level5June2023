@@ -1,0 +1,304 @@
+router_bgp:
+  as: '65105'
+  router_id: 192.168.101.6
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+  - graceful-restart restart-time 300
+  - graceful-restart
+  - maximum-paths 4 ecmp 4
+  peer_groups:
+    MLAG-IPv4-UNDERLAY-PEER:
+      type: ipv4
+      remote_as: '65105'
+      next_hop_self: true
+      description: borderleaf1-DC1
+      maximum_routes: 12000
+      send_community: all
+      route_map_in: RM-MLAG-PEER-IN
+    IPv4-UNDERLAY-PEERS:
+      type: ipv4
+      maximum_routes: 12000
+      send_community: all
+    EVPN-OVERLAY-PEERS:
+      type: evpn
+      update_source: Loopback0
+      bfd: true
+      ebgp_multihop: '3'
+      send_community: all
+      maximum_routes: 0
+  address_family_ipv4:
+    peer_groups:
+      MLAG-IPv4-UNDERLAY-PEER:
+        activate: true
+      IPv4-UNDERLAY-PEERS:
+        activate: true
+      EVPN-OVERLAY-PEERS:
+        activate: false
+  neighbors:
+    192.168.92.8:
+      peer_group: MLAG-IPv4-UNDERLAY-PEER
+      description: borderleaf1-DC1
+    192.168.103.30:
+      peer_group: IPv4-UNDERLAY-PEERS
+      remote_as: '65100'
+      description: spine1-DC1_Ethernet7
+    192.168.103.32:
+      peer_group: IPv4-UNDERLAY-PEERS
+      remote_as: '65100'
+      description: spine2-DC1_Ethernet7
+    192.168.103.34:
+      peer_group: IPv4-UNDERLAY-PEERS
+      remote_as: '65100'
+      description: spine3-DC1_Ethernet7
+    192.168.101.11:
+      peer_group: EVPN-OVERLAY-PEERS
+      description: spine1-DC1
+      remote_as: '65100'
+    192.168.101.12:
+      peer_group: EVPN-OVERLAY-PEERS
+      description: spine2-DC1
+      remote_as: '65100'
+    192.168.101.13:
+      peer_group: EVPN-OVERLAY-PEERS
+      description: spine3-DC1
+      remote_as: '65100'
+  redistribute_routes:
+    connected:
+      route_map: RM-CONN-2-BGP
+  address_family_evpn:
+    peer_groups:
+      EVPN-OVERLAY-PEERS:
+        activate: true
+  vrfs:
+    Kirk:
+      router_id: 192.168.101.6
+      rd: 192.168.101.6:100
+      route_targets:
+        import:
+          evpn:
+          - 100:100
+        export:
+          evpn:
+          - 100:100
+      neighbors:
+        192.168.92.8:
+          peer_group: MLAG-IPv4-UNDERLAY-PEER
+      redistribute_routes:
+      - connected
+  vlans:
+    10:
+      tenant: Star_Trek
+      rd: 192.168.101.6:10010
+      route_targets:
+        both:
+        - 10010:10010
+      redistribute_routes:
+      - learned
+    20:
+      tenant: Star_Trek
+      rd: 192.168.101.6:10020
+      route_targets:
+        both:
+        - 10020:10020
+      redistribute_routes:
+      - learned
+service_routing_protocols_model: multi-agent
+ip_routing: true
+vlan_internal_order:
+  allocation: ascending
+  range:
+    beginning: 1006
+    ending: 1199
+spanning_tree:
+  mode: mstp
+  mst_instances:
+    '0':
+      priority: 16384
+  no_spanning_tree_vlan: 4093-4094
+vrfs:
+  MGMT:
+    ip_routing: false
+  Kirk:
+    tenant: Star_Trek
+    ip_routing: true
+management_api_http:
+  enable_vrfs:
+    MGMT: {}
+  enable_https: true
+vlans:
+  4093:
+    tenant: system
+    name: LEAF_PEER_L3
+    trunk_groups:
+    - LEAF_PEER_L3
+  4094:
+    tenant: system
+    name: MLAG_PEER
+    trunk_groups:
+    - MLAG
+  10:
+    tenant: Star_Trek
+    name: VLAN_10
+  20:
+    tenant: Star_Trek
+    name: VLAN_20
+  3099:
+    tenant: Star_Trek
+    name: MLAG_iBGP_Kirk
+    trunk_groups:
+    - LEAF_PEER_L3
+vlan_interfaces:
+  Vlan4093:
+    description: MLAG_PEER_L3_PEERING
+    shutdown: false
+    ip_address: 192.168.92.9/31
+    mtu: 1550
+  Vlan4094:
+    description: MLAG_PEER
+    shutdown: false
+    ip_address: 192.168.91.9/31
+    no_autostate: true
+    mtu: 1550
+  Vlan10:
+    tenant: Star_Trek
+    tags:
+    - test
+    description: VLAN_10
+    shutdown: false
+    vrf: Kirk
+    ip_address_virtual: 10.1.10.1/24
+  Vlan20:
+    tenant: Star_Trek
+    tags:
+    - test
+    description: VLAN_20
+    shutdown: false
+    vrf: Kirk
+    ip_address_virtual: 10.1.20.1/24
+  Vlan3099:
+    tenant: Star_Trek
+    type: underlay_peering
+    shutdown: false
+    description: 'MLAG_PEER_L3_iBGP: vrf Kirk'
+    vrf: Kirk
+    ip_address: 192.168.92.9/31
+    mtu: 1550
+port_channel_interfaces:
+  Port-Channel1:
+    description: MLAG_PEER_borderleaf1-DC1_Po1
+    type: switched
+    shutdown: false
+    vlans: 2-4094
+    mode: trunk
+    trunk_groups:
+    - LEAF_PEER_L3
+    - MLAG
+ethernet_interfaces:
+  Ethernet1:
+    peer: borderleaf1-DC1
+    peer_interface: Ethernet1
+    peer_type: mlag_peer
+    description: MLAG_PEER_borderleaf1-DC1_Ethernet1
+    type: switched
+    shutdown: false
+    channel_group:
+      id: 1
+      mode: active
+  Ethernet2:
+    peer: borderleaf1-DC1
+    peer_interface: Ethernet2
+    peer_type: mlag_peer
+    description: MLAG_PEER_borderleaf1-DC1_Ethernet2
+    type: switched
+    shutdown: false
+    channel_group:
+      id: 1
+      mode: active
+  Ethernet3:
+    peer: spine1-DC1
+    peer_interface: Ethernet7
+    peer_type: spine
+    description: P2P_LINK_TO_SPINE1-DC1_Ethernet7
+    mtu: 1550
+    type: routed
+    shutdown: false
+    ip_address: 192.168.103.31/31
+  Ethernet4:
+    peer: spine2-DC1
+    peer_interface: Ethernet7
+    peer_type: spine
+    description: P2P_LINK_TO_SPINE2-DC1_Ethernet7
+    mtu: 1550
+    type: routed
+    shutdown: false
+    ip_address: 192.168.103.33/31
+  Ethernet5:
+    peer: spine3-DC1
+    peer_interface: Ethernet7
+    peer_type: spine
+    description: P2P_LINK_TO_SPINE3-DC1_Ethernet7
+    mtu: 1550
+    type: routed
+    shutdown: false
+    ip_address: 192.168.103.35/31
+mlag_configuration:
+  domain_id: dc1_mlag3
+  local_interface: Vlan4094
+  peer_address: 192.168.91.8
+  peer_link: Port-Channel1
+  reload_delay_mlag: 300
+  reload_delay_non_mlag: 330
+route_maps:
+  RM-MLAG-PEER-IN:
+    sequence_numbers:
+      10:
+        type: permit
+        set:
+        - origin incomplete
+        description: Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
+  RM-CONN-2-BGP:
+    sequence_numbers:
+      10:
+        type: permit
+        match:
+        - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+loopback_interfaces:
+  Loopback0:
+    description: EVPN_Overlay_Peering
+    shutdown: false
+    ip_address: 192.168.101.6/32
+  Loopback1:
+    description: VTEP_VXLAN_Tunnel_Source
+    shutdown: false
+    ip_address: 192.168.102.5/32
+prefix_lists:
+  PL-LOOPBACKS-EVPN-OVERLAY:
+    sequence_numbers:
+      10:
+        action: permit 192.168.101.0/24 eq 32
+      20:
+        action: permit 192.168.102.0/24 eq 32
+router_bfd:
+  multihop:
+    interval: 300
+    min_rx: 300
+    multiplier: 3
+ip_igmp_snooping:
+  globally_enabled: true
+ip_virtual_router_mac_address: 00:1c:73:00:00:99
+vxlan_interface:
+  Vxlan1:
+    description: borderleaf2-DC1_VTEP
+    vxlan:
+      source_interface: Loopback1
+      virtual_router_encapsulation_mac_address: mlag-system-id
+      udp_port: 4789
+      vlans:
+        10:
+          vni: 10010
+        20:
+          vni: 10020
+      vrfs:
+        Kirk:
+          vni: 100
