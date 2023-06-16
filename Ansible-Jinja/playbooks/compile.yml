@@ -1,0 +1,8 @@
+---
+- name: Concatenate various files into a single file
+  hosts: leaf1-DC1
+  tasks:
+    - name: Assemble files into a single file
+      assemble:
+        src: "./configs/leaf1-DC1"
+        dest: "./configs/leaf1-DC1_complete.txt"

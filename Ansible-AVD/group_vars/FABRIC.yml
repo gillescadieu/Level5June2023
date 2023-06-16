@@ -1,0 +1,50 @@
+--- 
+
+fabric_name: FABRIC
+
+
+p2p_uplinks_mtu: 1550
+
+max_super_spines: 4
+max_spine_to_super_spine_links: 4
+super_spine:
+  defaults: 
+    bgp_as: 65001
+    loopback_ipv4_pool: 192.168.93.0/24
+    evpn_role: server
+  nodes:  
+    DCI:
+      id: 1
+      mgmt_ip: 192.168.0.76
+super_spine_bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+
+l3_edge:
+  p2p_links_ip_pools:
+    dci_evpn_gateway: 172.31.252.0/24
+  p2p_links:
+    - id: 1
+      ip_pool: dci_evpn_gateway
+      nodes: [borderleaf1-DC1, DCI]
+      interfaces: [Ethernet12, Ethernet1]
+      as: [65199, 65000]
+      include_in_underlay_protocol: true
+    - id: 2
+      ip_pool: dci_evpn_gateway
+      nodes: [borderleaf2-DC1, DCI]
+      interfaces: [Ethernet12, Ethernet2]
+      as: [65199, 65000]
+      include_in_underlay_protocol: true
+    - id: 3
+      ip_pool: dci_evpn_gateway
+      nodes: [borderleaf1-DC2, DCI]
+      interfaces: [Ethernet12, Ethernet3]
+      as: [65299, 65000]
+      include_in_underlay_protocol: true
+    - id: 4
+      ip_pool: dci_evpn_gateway
+      nodes: [borderleaf2-DC2, DCI]
+      interfaces: [Ethernet12, Ethernet4]
+      as: [65299, 65000]
+      include_in_underlay_protocol: true

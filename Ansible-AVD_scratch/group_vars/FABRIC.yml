@@ -1,0 +1,71 @@
+# Overall Fabric variables
+
+fabric_name: FABRIC
+p2p_uplinks_mtu: 1550
+
+
+spine:
+  defaults:
+#    platform: vEOS-LAB # 
+    bgp_as: 65100
+    loopback_ipv4_pool: 192.168.101.0/24
+    bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+    mlag: false
+  nodes:
+    spine1-DC1:
+      id: 11
+      mgmt_ip: 192.168.0.11/24
+    spine2-DC1:
+      id: 12
+      mgmt_ip: 192.168.0.12/24
+    spine3-DC1:
+      id: 13
+      mgmt_ip: 192.168.0.13/24
+
+
+
+l3leaf:
+  defaults:
+    bgp_as: 65100-65199 # Gives a range which will be auto-assigned
+#    platform: vEOS-LAB
+    loopback_ipv4_pool: 192.168.101.0/24 # This is loopback0 (underlay)
+    vtep_loopback_ipv4_pool: 192.168.102.0/24 # This is loopback1 (VTEP)
+    uplink_interfaces: [Ethernet3, Ethernet4, Ethernet5] # Leaf uplinks
+    uplink_switches: [spine1-DC1, spine2-DC1, spine3-DC1] # Where the leaf uplinks go
+    uplink_ipv4_pool: 192.168.103.0/24 # For the p2p interfaces to chopped up into /31s
+    mlag_interfaces: [Ethernet1, Ethernet2] # MLAG peer link
+    mlag_peer_ipv4_pool: 10.255.252.0/24 # MLAG peer IPs
+    mlag_peer_l3_ipv4_pool: 10.255.251.0/24 # iBGP peering between MLAG peers
+    virtual_router_mac_address: 00:1c:73:00:00:99 # The vMAC for the anycast gateways
+    bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+      - 'graceful-restart restart-time 300'
+      - 'graceful-restart'
+    spanning_tree_mode: mstp # Spanning Tree is still enabled even in EVPN setups
+    spanning_tree_priority: 16384 
+    mlag: true # By default, use MLAG
+
+  node_groups:
+    dc1_mlag1:
+      nodes:
+        leaf1-DC1:
+          id: 1
+          mgmt_ip: 192.168.0.21/24
+          uplink_switch_interfaces: [Ethernet2, Ethernet2, Ethernet1]
+        leaf2-DC1:
+          id: 2
+          mgmt_ip: 192.168.0.22/24
+          uplink_switch_interfaces: [Ethernet3, Ethernet3, Ethernet2]
+    dc1_mlag2:
+      nodes:
+        leaf3-DC1:
+          id: 3
+          mgmt_ip: 192.168.0.23/24
+          uplink_switch_interfaces: [Ethernet4, Ethernet4, Ethernet3]
+        leaf4-DC1:
+          id: 4
+          mgmt_ip: 192.168.0.24/24
+          uplink_switch_interfaces: [Ethernet5, Ethernet5, Ethernet4]

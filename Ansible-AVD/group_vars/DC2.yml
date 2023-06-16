@@ -1,0 +1,80 @@
+
+spine:
+  type: spine
+  defaults:
+    bgp_as: 65200
+    loopback_ipv4_pool: 192.168.201.0/24
+    bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+    mlag: False
+  nodes:
+    spine1-DC2:
+      id: 11
+      mgmt_ip: 192.168.0.14/24
+    spine2-DC2:
+      id: 12
+      mgmt_ip: 192.168.0.15/24
+    spine3-DC2:
+      id: 13
+      mgmt_ip: 192.168.0.16/24
+
+l3leaf:
+  type: l3leaf
+  defaults:
+    bgp_as: 65201-65290
+    loopback_ipv4_pool: 192.168.201.0/24
+    vtep_loopback_ipv4_pool: 192.168.202.0/24
+    uplink_interfaces: [Ethernet3, Ethernet4, Ethernet5]
+    uplink_switches: [spine1-DC2, spine2-DC2, spine3-DC2]
+    uplink_ipv4_pool: 192.168.203.0/24
+    mlag_interfaces: [Ethernet1, Ethernet2]
+    mlag_peer_ipv4_pool: 192.168.91.0/24
+    mlag_peer_l3_ipv4_pool: 192.168.92.0/24
+    virtual_router_mac_address: 00:1c:73:00:00:99
+    bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+      - 'graceful-restart restart-time 300'
+      - 'graceful-restart'
+    spanning_tree_mode: mstp
+    spanning_tree_priority: 16384
+    mlag: true
+
+  node_groups:
+    dc2_mlag1:
+      nodes:  
+        leaf1-DC2:
+          id: 1
+          mgmt_ip: 192.168.0.31/24
+          uplink_switch_interfaces: [Ethernet2, Ethernet2, Ethernet2]
+        leaf2-DC2:
+          id: 2
+          mgmt_ip: 192.168.0.32/24
+          uplink_switch_interfaces: [Ethernet3, Ethernet3, Ethernet3]
+    dc2_mlag2:
+      nodes:  
+        leaf3-DC2:
+          id: 3
+          mgmt_ip: 192.168.0.33/24
+          uplink_switch_interfaces: [Ethernet4, Ethernet4, Ethernet4]
+        leaf4-DC2:
+          id: 4
+          mgmt_ip: 192.168.0.34/24
+          uplink_switch_interfaces: [Ethernet5, Ethernet5, Ethernet5]
+    dc2_mlag3:
+      bgp_as: 65299
+      nodes:
+        borderleaf1-DC2:  
+          id: 5
+          mgmt_ip: 192.168.0.35/24
+          uplink_switches: [spine1-DC2, spine2-DC2, spine3-DC2, DCI]
+          uplink_switch_interfaces: [Ethernet7, Ethernet7, Ethernet7, leaf2-DC2_Ethernet3]
+          evpn_route_servers: [spine1-DC2, spine2-DC2, spine3-DC2, DCI]
+
+        borderleaf2-DC2:  
+          id: 6
+          mgmt_ip: 192.168.0.36/24
+          uplink_switches: [spine1-DC2, spine2-DC2, spine3-DC2, DCI]
+          uplink_switch_interfaces: [Ethernet7, Ethernet7, Ethernet7, Ethernet4]
+          evpn_route_servers: [spine1-DC2, spine2-DC2, spine3-DC2, DCI]

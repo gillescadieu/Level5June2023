@@ -1,0 +1,17 @@
+tenants:
+  Star_Trek:
+    mac_vrf_vni_base: 10000
+    vrfs:
+      Kirk:
+        vrf_vni: 100
+        svis:
+          10:
+            name: VLAN_10
+            enabled: true
+            tags: [test]
+            ip_address_virtual: 10.1.10.1/24
+          20:
+            name: VLAN_20
+            enabled: true
+            tags: [test]
+            ip_address_virtual: 10.1.20.1/24

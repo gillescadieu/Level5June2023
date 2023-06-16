@@ -1,0 +1,50 @@
+---
+servers:
+  host1-DC1:
+    adapters:
+      - type: nic
+        server_ports: [Eth1, Eth2, Eth3, Eth4]
+        switch_ports: [Ethernet6, Ethernet7, Ethernet6, Ethernet7]
+        switches: [leaf1-DC1, leaf1-DC1, leaf2-DC1, leaf2-DC1]
+        vlans: 10
+        mode: access
+        spanning_tree_portfast: edge
+        port_channel:
+          mode: active
+          description: connection_host1-dc1
+  host2-DC1:
+    adapters:
+      - type: nic
+        server_ports: [Eth1, Eth2, Eth3, Eth4]
+        switch_ports: [Ethernet6, Ethernet7, Ethernet6, Ethernet7]
+        switches: [leaf3-DC1, leaf3-DC1, leaf4-DC1, leaf4-DC1]
+        vlans: 20
+        mode: access
+        spanning_tree_portfast: edge
+        port_channel:
+          mode: active
+          description: Connection_host2-dc1
+  host1-DC2:
+    adapters:
+      - type: nic
+        server_ports: [Eth1, Eth2, Eth3, Eth4]
+        switch_ports: [Ethernet6, Ethernet7, Ethernet6, Ethernet7]
+        switches: [leaf1-DC2, leaf1-DC2, leaf2-DC2, leaf2-DC2]
+        vlans: 10
+        mode: access
+        spanning_tree_portfast: edge
+        port_channel:
+          mode: active
+          description: connection_host1-dc2
+  host2-DC2:
+    adapters:
+      - type: nic
+        server_ports: [Eth1, Eth2, Eth3, Eth4]
+        switch_ports: [Ethernet6, Ethernet7, Ethernet6, Ethernet7]
+        switches: [leaf3-DC2, leaf3-DC2, leaf4-DC2, leaf4-DC2]
+        vlans: 20
+        mode: access
+        spanning_tree_portfast: edge
+        port_channel:
+          mode: active
+          description: Connection_host2-dc2

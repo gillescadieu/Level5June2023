@@ -1,0 +1,66 @@
+ip virtual-router mac-address 001c.7300.0099
+
+{% for vrf in Tenants['Tenants'] %}
+vrf instance {{ vrf }}
+ip routing vrf {{ vrf }}
+{% endfor %}
+
+
+{% for Tenant in Tenants['Tenants'] %}
+{%   for L2VNI in Tenants['Tenants'][Tenant]['L2VNI'] %}
+VLAN {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VLANID']}}
+{%   endfor %}
+{% endfor %}
+
+
+
+
+
+{% for Tenant in Tenants['Tenants'] %}
+{%   for L2VNI in Tenants['Tenants'][Tenant]['L2VNI'] %}
+interface vlan {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VLANID'] }}
+   vrf {{ Tenant }}
+   ip address virtual {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['SVI'] }}
+{% endfor %}
+{% endfor %}
+
+
+
+
+interface vxlan1
+  vxlan source-interface Loopback1
+  vxlan udp-port 4789
+
+{% for Tenant in Tenants['Tenants'] %}
+  vxlan vrf {{ Tenant }} vni {{ Tenants['Tenants'][Tenant]['L3VNI'] }}
+{% endfor %}
+
+
+{% for Tenant in Tenants['Tenants'] %}
+{%   for L2VNI in Tenants['Tenants'][Tenant]['L2VNI'] %}
+  vxlan vlan {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VLANID'] }} vni {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VNID'] }} 
+{% endfor %}
+{% endfor %}
+
+
+
+router bgp {{ underlay['devices'][inventory_hostname]['BGP']['ASN']}}
+  
+{% for Tenant in Tenants['Tenants'] %}
+  vrf {{ Tenant }}
+    rd {{ underlay['devices'][inventory_hostname]['interfaces']['loopback0']['ipv4'] }}:{{ Tenants['Tenants'][Tenant]['L3VNI'] }}
+    route-target import evpn {{ Tenants['Tenants'][Tenant]['L3VNI'] }}:{{ Tenants['Tenants'][Tenant]['L3VNI'] }}
+    route-target export evpn {{ Tenants['Tenants'][Tenant]['L3VNI'] }}:{{ Tenants['Tenants'][Tenant]['L3VNI'] }}
+    redistribute connected
+{% endfor %}
+ 
+
+
+{% for Tenant in Tenants['Tenants'] %}
+{%   for L2VNI in Tenants['Tenants'][Tenant]['L2VNI'] %}
+  vlan {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VLANID']}}
+    rd auto
+    route-target both {{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VNID'] }}:{{ Tenants['Tenants'][Tenant]['L2VNI'][L2VNI]['VNID'] }}
+    redistribute learned
+{%   endfor %}
+{% endfor %}
